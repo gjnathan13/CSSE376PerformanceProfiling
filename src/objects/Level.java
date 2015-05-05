@@ -199,6 +199,8 @@ public class Level {
 	 *            the pixel size of a tile. 32 is perferable.
 	 */
 	BufferedImage img;
+	private int[][] oldMap;
+	
 	public void populateMap(String fileName, int tileSize) {
 		try {
 			String parser = " ";
@@ -226,7 +228,16 @@ public class Level {
 					// stored in level.
 					this.map[c][r] = Integer.parseInt(currentLineValues[c]);
 				}
+				
+				
 			}
+			this.oldMap = new int[this.mapHeight][this.mapWidth];
+			for(int i=0; i < this.mapHeight; i++){
+				for(int j=0; j < this.mapWidth; j++){
+					this.oldMap[i][j] = -1;
+				}
+			}
+			
 			img = new BufferedImage(this.mapWidth*this.tileSize,this.mapHeight*this.tileSize,BufferedImage.TYPE_INT_RGB);
 			imageReader.close();
 			generateBarrierCollisionBoxes();
@@ -334,10 +345,19 @@ public class Level {
 		for (int r = 0; r < this.map.length; r++) {
 			for (int c = 0; c < this.map[r].length; c++) {
 				currentPosition = this.map[r][c];
+				int oldPosition = this.oldMap[r][c];
+				if(currentPosition != oldPosition){
 				drawTileImage(currentPosition, r, c, g);
+				}
 			}
 		}
 		g.dispose();
+		for(int i = 0; i < this.map.length; i++){
+			for (int j = 0; j < this.map[i].length; j++){
+				this.oldMap[i][j] = this.map[i][j];
+			}
+		}
+		
 		// draw cached tiles
 		g2.drawImage(img, 0, 0, img.getWidth(), img.getHeight(), null);
 	}
